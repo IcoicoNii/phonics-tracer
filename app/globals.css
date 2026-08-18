@@ -1,26 +1,345 @@
-@import "tailwindcss";
+@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap');
 
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ── Design tokens ─────────────────────────────────────────────────────────── */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --color-bg: #FEF6EC;
+  --color-bg2: #EEF4FF;
+  --color-surface: #FFFFFF;
+
+  --color-primary: #FF8C42;
+  --color-primary-dark: #E5731A;
+  --color-primary-light: #FFD4B2;
+
+  --color-accent-green: #3DD68C;
+  --color-accent-blue: #4B9EFF;
+  --color-accent-purple: #A78BFA;
+  --color-accent-pink: #FF6B9D;
+
+  --color-text: #2D2A4A;
+  --color-text-muted: #8B8BA8;
+  --color-danger: #FF6B6B;
+  --color-canvas-bg: #FEFCF8;
+
+  --font-main: 'Nunito', 'Comic Sans MS', sans-serif;
+
+  /* Safe areas (iOS notch / home indicator) */
+  --safe-top:    env(safe-area-inset-top,    0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+  --safe-left:   env(safe-area-inset-left,   0px);
+  --safe-right:  env(safe-area-inset-right,  0px);
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
+/* ── Reset ─────────────────────────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+html {
+  height: 100%;
+  /* Prevent iOS font-size bump in landscape */
+  -webkit-text-size-adjust: 100%;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  height: 100%;
+  font-family: var(--font-main);
+  color: var(--color-text);
+  background: linear-gradient(160deg, #FEF6EC 0%, #EEF4FF 100%);
+  background-attachment: fixed;
+  min-height: 100vh;
+  /* Kill iOS tap flash */
+  -webkit-tap-highlight-color: transparent;
+  /* Allow text selection only where needed */
+  user-select: none;
+  -webkit-user-select: none;
+  /* Prevent iOS bounce-scroll from interfering */
+  overscroll-behavior: none;
+}
+
+/* ── Animations ────────────────────────────────────────────────────────────── */
+
+@keyframes letterBounce {
+  0%, 100% { transform: scale(1) rotate(0deg); }
+  25%  { transform: scale(1.2) rotate(-4deg); }
+  55%  { transform: scale(0.92) rotate(3deg); }
+  78%  { transform: scale(1.07) rotate(-1deg); }
+}
+
+@keyframes starPop {
+  0%   { transform: scale(0) rotate(-30deg); opacity: 0; }
+  65%  { transform: scale(1.35) rotate(6deg); opacity: 1; }
+  100% { transform: scale(1) rotate(0deg); opacity: 1; }
+}
+
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fadeInScale {
+  from { opacity: 0; transform: scale(0.88); }
+  to   { opacity: 1; transform: scale(1); }
+}
+
+@keyframes celebrationBounce {
+  0%   { transform: scale(0.3) rotate(-12deg); opacity: 0; }
+  52%  { transform: scale(1.3) rotate(4deg);   opacity: 1; }
+  75%  { transform: scale(0.9) rotate(-2deg); }
+  100% { transform: scale(1) rotate(0deg); }
+}
+
+@keyframes shimmer {
+  0%   { background-position: -200% center; }
+  100% { background-position:  200% center; }
+}
+
+/* ── Animation classes ─────────────────────────────────────────────────────── */
+.animate-letter-bounce { animation: letterBounce 0.52s cubic-bezier(0.34, 1.56, 0.64, 1) both; }
+.animate-star-pop      { animation: starPop 0.42s cubic-bezier(0.34, 1.56, 0.64, 1) forwards; }
+.animate-fade-in-up    { animation: fadeInUp 0.32s ease-out forwards; }
+.animate-fade-in-scale { animation: fadeInScale 0.38s cubic-bezier(0.34, 1.56, 0.64, 1) forwards; }
+.animate-celebration   { animation: celebrationBounce 0.62s cubic-bezier(0.34, 1.56, 0.64, 1) forwards; }
+
+/* ── Letter button ─────────────────────────────────────────────────────────── */
+/*
+ * FIX: touch-action: manipulation removes the 300ms iOS tap delay and
+ * allows immediate response on iPad. Combined with removing setTimeout
+ * from router.push(), this fixes the "tap does nothing" bug on iPad.
+ */
+.letter-btn {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  aspect-ratio: 1 / 1;
+  border-radius: 18px;
+  font-family: var(--font-main);
+  font-weight: 900;
+  color: white;
+  cursor: pointer;
+  border: none;
+  outline: none;
+  text-decoration: none;
+  /* Critical for iPad: eliminates 300ms delay, allows immediate press */
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  transition: transform 0.13s cubic-bezier(0.34, 1.56, 0.64, 1),
+              box-shadow 0.13s ease;
+  /* Prevent iOS callout on long-press */
+  -webkit-touch-callout: none;
+}
+
+.letter-btn:active {
+  transform: scale(0.91) translateY(2px) !important;
+}
+
+/* Subtle gloss overlay */
+.letter-btn::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: linear-gradient(
+    160deg,
+    rgba(255,255,255,0.28) 0%,
+    rgba(255,255,255,0.06) 50%,
+    rgba(0,0,0,0.04) 100%
+  );
+  pointer-events: none;
+}
+
+/* ── Glass card ────────────────────────────────────────────────────────────── */
+.glass-card {
+  background: rgba(255, 255, 255, 0.78);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1.5px solid rgba(255, 255, 255, 0.95);
+  border-radius: 20px;
+  box-shadow: 0 2px 16px rgba(45, 42, 74, 0.07), 0 1px 4px rgba(45,42,74,0.04);
+}
+
+/* ── Case toggle ───────────────────────────────────────────────────────────── */
+.case-toggle {
+  display: flex;
+  align-items: center;
+  background: white;
+  border-radius: 16px;
+  padding: 4px;
+  gap: 2px;
+  box-shadow: 0 2px 12px rgba(45,42,74,0.09), 0 1px 3px rgba(45,42,74,0.05);
+}
+
+.case-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  /* Minimum 44×44 touch target (Apple HIG) */
+  min-width: 52px;
+  min-height: 52px;
+  padding: 6px 12px;
+  border-radius: 13px;
+  font-weight: 800;
+  font-size: 11px;
+  line-height: 1;
+  gap: 3px;
+  justify-content: center;
+  touch-action: manipulation;
+  cursor: pointer;
+  border: none;
+  outline: none;
+  color: var(--color-text-muted);
+  background: transparent;
+  transition: all 0.18s cubic-bezier(0.34, 1.56, 0.64, 1);
+  -webkit-tap-highlight-color: transparent;
+}
+
+.case-btn.active {
+  background: var(--color-primary);
+  color: white;
+  box-shadow: 0 3px 10px rgba(255, 140, 66, 0.38);
+  transform: scale(1.03);
+}
+
+.case-btn:active { transform: scale(0.94); }
+
+/* ── Nav / action buttons ──────────────────────────────────────────────────── */
+.nav-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  /* 44px min height for Apple HIG touch target */
+  min-height: 44px;
+  min-width: 64px;
+  padding: 0 16px;
+  border-radius: 16px;
+  font-family: var(--font-main);
+  font-weight: 800;
+  font-size: 14px;
+  color: var(--color-text-muted);
+  border: none;
+  outline: none;
+  cursor: pointer;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  transition: transform 0.14s cubic-bezier(0.34, 1.56, 0.64, 1);
+  white-space: nowrap;
+}
+
+.nav-btn:active { transform: scale(0.93); }
+
+/* ── Tracing canvas ────────────────────────────────────────────────────────── */
+.tracing-canvas {
+  display: block;
+  touch-action: none;   /* prevent scroll/zoom while drawing */
+  cursor: crosshair;
+  border-radius: 24px;
+}
+
+.canvas-wrapper {
+  position: relative;
+  border-radius: 28px;
+  overflow: hidden;
+  background: var(--color-canvas-bg);
+  box-shadow:
+    inset 0 0 0 1px rgba(255,255,255,0.9),
+    0 8px 40px rgba(45, 42, 74, 0.13),
+    0 2px 8px  rgba(45, 42, 74, 0.07);
+}
+
+/* ── Brush picker ──────────────────────────────────────────────────────────── */
+.brush-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  /* 44px tall touch target */
+  min-height: 56px;
+  min-width: 64px;
+  padding: 8px 18px;
+  border-radius: 16px;
+  font-size: 11px;
+  font-weight: 800;
+  cursor: pointer;
+  border: 2px solid transparent;
+  background: white;
+  color: var(--color-text-muted);
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  transition: all 0.16s cubic-bezier(0.34, 1.56, 0.64, 1);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+}
+
+.brush-btn:active { transform: scale(0.93); }
+
+.brush-btn.active {
+  border-color: var(--color-primary);
+  background: linear-gradient(135deg, #FFF3EB, #FFE8D6);
+  color: var(--color-primary-dark);
+  transform: scale(1.05);
+  box-shadow: 0 4px 16px rgba(255,140,66,0.28);
+}
+
+/* ── Progress bar ──────────────────────────────────────────────────────────── */
+.progress-bar-track {
+  height: 14px;
+  background: rgba(45, 42, 74, 0.08);
+  border-radius: 99px;
+  overflow: hidden;
+}
+
+.progress-bar-fill {
+  height: 100%;
+  border-radius: 99px;
+  background: linear-gradient(90deg, #3DD68C, #4B9EFF, #A78BFA);
+  background-size: 200% auto;
+  animation: shimmer 3s linear infinite;
+  transition: width 0.7s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* ── Celebration overlay ───────────────────────────────────────────────────── */
+.celebration-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  background: radial-gradient(
+    ellipse at center,
+    rgba(255,255,255,0.96) 60%,
+    rgba(255,248,236,0.99) 100%
+  );
+  border-radius: inherit;
+  animation: fadeInScale 0.38s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+/* ── Status pill ───────────────────────────────────────────────────────────── */
+.status-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 9px 20px;
+  border-radius: 99px;
+  font-size: 14px;
+  font-weight: 800;
+  background: white;
+  box-shadow: 0 2px 12px rgba(45,42,74,0.10);
+  transition: color 0.25s ease;
+}
+
+/* ── Stroke progress dot ───────────────────────────────────────────────────── */
+.stroke-dot {
+  display: block;
+  height: 10px;
+  border-radius: 99px;
+  transition: width 0.25s cubic-bezier(0.34,1.56,0.64,1),
+              background 0.25s ease,
+              box-shadow 0.25s ease;
 }
