@@ -94,7 +94,7 @@ export default function HomePage() {
 
       {/* ── Letter grid ────────────────────────────────────────────────────── */}
       <main
-        className="flex-1 w-full border max-w-2xl mx-auto px-4 pb-6"
+        className="flex-1 w-[90vw] max-w-2xl mx-auto px-4 pb-6"
         style={{ paddingBottom: `calc(1.5rem + var(--safe-bottom))` }}
       >
         {/*

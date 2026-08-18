@@ -106,7 +106,7 @@ export default function TracePage() {
 
       {/* ── Top bar ──────────────────────────────────────────────────────── */}
       <header
-        className="w-full max-w-lg px-4 pt-5 pb-2"
+        className="w-full max-w-[800px] px-4 pt-5 pb-2 mx-auto"
       >
         <div className="flex items-center justify-between gap-3">
           {/* Back button — router.back() is synchronous, safe on iOS */}
@@ -155,7 +155,7 @@ export default function TracePage() {
 
       {/* ── Letter identity card ──────────────────────────────────────────── */}
       <div
-        className="mx-4 mt-2 w-full max-w-lg px-5 py-4 rounded-3xl flex items-center gap-5"
+        className="mx-4 mt-2 w-full max-w-[800px] px-5 py-4 rounded-3xl flex items-center gap-5 mx-auto"
         style={{
           background: `linear-gradient(135deg, ${color}1A, ${color}3A)`,
           border: `2px solid ${color}55`,
@@ -199,8 +199,12 @@ export default function TracePage() {
 
       {/* ── Canvas ───────────────────────────────────────────────────────── */}
       <div
-        className="canvas-wrapper mx-4 mt-4 w-full max-w-lg"
-        style={{ border: `3px solid ${color}44` }}
+        className="canvas-wrapper mx-auto mt-4 w-[92vw] max-w-[800px]"
+        style={{ 
+          border: `3px solid ${color}44`,
+          resize: "horizontal", // allows resizing on desktop
+          overflow: "hidden"
+        }}
       >
         <canvas
           ref={canvasRef}
@@ -290,7 +294,7 @@ export default function TracePage() {
 
       {/* ── Progress row ──────────────────────────────────────────────────── */}
       <div
-        className="glass-card flex items-center gap-3 mt-4 mx-4 px-5 py-3 w-full max-w-lg mb-4"
+        className="glass-card flex items-center gap-3 mt-4 mx-auto px-5 py-3 w-[92vw] max-w-[800px] mb-4"
       >
         <span
           className="text-xs font-black uppercase tracking-widest flex-shrink-0"
