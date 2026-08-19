@@ -46,7 +46,12 @@ body {
   height: 100%;
   font-family: var(--font-main);
   color: var(--color-text);
-  background: linear-gradient(160deg, #FEF6EC 0%, #EEF4FF 100%);
+  background-color: #FEF6EC;
+  background-image: 
+    radial-gradient(#D3DFEF 2px, transparent 2px),
+    linear-gradient(160deg, rgba(254, 246, 236, 0.7) 0%, rgba(238, 244, 255, 0.7) 100%);
+  background-size: 24px 24px, 100% 100%;
+  background-position: 0 0, 0 0;
   background-attachment: fixed;
   min-height: 100vh;
   /* Kill iOS tap flash */
@@ -114,7 +119,7 @@ body {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 2px;
+  gap: 5px;
   aspect-ratio: 1 / 1;
   border-radius: 18px;
   font-family: var(--font-main);
@@ -154,12 +159,15 @@ body {
 
 /* ── Glass card ────────────────────────────────────────────────────────────── */
 .glass-card {
-  background: rgba(255, 255, 255, 0.78);
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
-  border: 1.5px solid rgba(255, 255, 255, 0.95);
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 2px solid rgba(255, 255, 255, 0.95);
   border-radius: 20px;
-  box-shadow: 0 2px 16px rgba(45, 42, 74, 0.07), 0 1px 4px rgba(45,42,74,0.04);
+  box-shadow: 
+    0 4px 20px rgba(45, 42, 74, 0.08),
+    0 1px 4px rgba(45, 42, 74, 0.04),
+    inset 0 2px 4px rgba(255, 255, 255, 0.6);
 }
 
 /* ── Case toggle ───────────────────────────────────────────────────────────── */

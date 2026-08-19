@@ -6,7 +6,7 @@ import type { LetterPath, Checkpoint } from "@/lib/letterPaths";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
-export type BrushTheme = "plain" | "neon" | "stars";
+export type BrushTheme = "plain" | "neon" | "stars" | "paper";
 export type TracePoint = { x: number; y: number };
 export type EngineState = "demo" | "idle" | "tracing" | "paused" | "complete";
 
@@ -319,19 +319,58 @@ export function useTracingEngine({
 
       // ── Soft paper background ──────────────────────────────────────────────
       ctx.save();
-      ctx.fillStyle = "#FEFCF8";
+      ctx.fillStyle = brushTheme === "paper" ? "#FFFEF8" : "#FEFCF8";
       roundRect(ctx, 0, 0, canvasWidth, canvasHeight, 0);
       ctx.fill();
 
-      // Subtle dot grid
-      ctx.globalAlpha = 0.06;
-      ctx.fillStyle = "#8B8BA8";
-      const GRID = 22 * sx;
-      for (let gx = GRID; gx < canvasWidth - GRID * 0.5; gx += GRID) {
-        for (let gy = GRID; gy < canvasHeight - GRID * 0.5; gy += GRID) {
-          ctx.beginPath();
-          ctx.arc(gx, gy, 1.5 * sx, 0, Math.PI * 2);
-          ctx.fill();
+      if (brushTheme === "paper") {
+        // ── Ruled handwriting paper lines (blue–red–blue) ──────────────────
+        // Standard 4-line handwriting paper:
+        //   - Top line (blue)       — ascender line
+        //   - Mid-upper line (red)  — dotted midline / x-height
+        //   - Mid-lower line (blue) — baseline
+        //   - Bottom line (blue)    — descender line
+        // We repeat this pattern vertically across the canvas.
+        const rowH  = 60 * sy;          // height of one ruled set
+        const rows  = Math.ceil(canvasHeight / rowH) + 1;
+        const startY = (canvasHeight % rowH) / 2; // center the pattern
+
+        for (let r = 0; r < rows; r++) {
+          const base = startY + r * rowH;
+
+          // Descender line (blue, faint)
+          drawRuledLine(ctx, 0, base + rowH, canvasWidth, "#9AC0E8", 0.9, 1.1 * sx, false);
+          // Baseline (blue, strong)
+          drawRuledLine(ctx, 0, base + rowH * 0.67, canvasWidth, "#5A9FD4", 1.0, 1.5 * sx, false);
+          // Midline (red, dashed)
+          drawRuledLine(ctx, 0, base + rowH * 0.33, canvasWidth, "#E05A6A", 0.85, 1.1 * sx, true);
+          // Top / ascender line (blue, faint)
+          drawRuledLine(ctx, 0, base, canvasWidth, "#9AC0E8", 0.75, 1.0 * sx, false);
+        }
+
+        // Left margin red vertical line
+        const marginX = 28 * sx;
+        ctx.save();
+        ctx.globalAlpha = 0.45;
+        ctx.strokeStyle = "#E05A6A";
+        ctx.lineWidth = 1.5 * sx;
+        ctx.beginPath();
+        ctx.moveTo(marginX, 0);
+        ctx.lineTo(marginX, canvasHeight);
+        ctx.stroke();
+        ctx.restore();
+
+      } else {
+        // Subtle dot grid (default)
+        ctx.globalAlpha = 0.06;
+        ctx.fillStyle = "#8B8BA8";
+        const GRID = 22 * sx;
+        for (let gx = GRID; gx < canvasWidth - GRID * 0.5; gx += GRID) {
+          for (let gy = GRID; gy < canvasHeight - GRID * 0.5; gy += GRID) {
+            ctx.beginPath();
+            ctx.arc(gx, gy, 1.5 * sx, 0, Math.PI * 2);
+            ctx.fill();
+          }
         }
       }
       ctx.restore();
@@ -623,11 +662,22 @@ function drawTrail(
     for (let i = 0; i < pts.length; i += step) {
       ctx.fillText("⭐", pts[i].x, pts[i].y);
     }
+  } else if (theme === "paper") {
+    // Pencil on ruled paper — soft grey with slight texture
+    ctx.strokeStyle = "rgba(60, 60, 80, 0.82)";
+    ctx.lineWidth = 9 * sx;
+    ctx.shadowColor = "rgba(60,60,80,0.18)";
+    ctx.shadowBlur = 3;
+    tracePath(ctx, pts);
+    // Fine highlight to mimic pencil sheen
+    ctx.strokeStyle = "rgba(255,255,255,0.28)";
+    ctx.lineWidth = 2.5 * sx;
+    ctx.shadowBlur = 0;
+    tracePath(ctx, pts);
   }
   ctx.restore();
 }
 
-/** Demo ghost trail rendering */
 function drawDemoTrail(
   ctx: CanvasRenderingContext2D,
   pts: TracePoint[],
@@ -804,5 +854,30 @@ function drawArrow(
   ctx.closePath();
   ctx.fill();
 
+  ctx.restore();
+}
+
+/** Draws a single horizontal ruled line (blue or red, optionally dashed) */
+function drawRuledLine(
+  ctx: CanvasRenderingContext2D,
+  x: number,
+  y: number,
+  width: number,
+  color: string,
+  alpha: number,
+  lineWidth: number,
+  dashed: boolean
+) {
+  ctx.save();
+  ctx.globalAlpha = alpha;
+  ctx.strokeStyle = color;
+  ctx.lineWidth = lineWidth;
+  ctx.lineCap = "square";
+  if (dashed) ctx.setLineDash([8, 6]);
+  ctx.beginPath();
+  ctx.moveTo(x, y);
+  ctx.lineTo(x + width, y);
+  ctx.stroke();
+  ctx.setLineDash([]);
   ctx.restore();
 }

@@ -8,9 +8,10 @@ type Props = {
 };
 
 const THEMES: { id: BrushTheme; label: string; icon: string }[] = [
-  { id: "plain", label: "Pen",   icon: "✏️" },
-  { id: "neon",  label: "Neon",  icon: "💡" },
-  { id: "stars", label: "Stars", icon: "⭐" },
+  { id: "plain",  label: "Pen",   icon: "✏️" },
+  { id: "neon",   label: "Neon",  icon: "💡" },
+  { id: "stars",  label: "Stars", icon: "⭐" },
+  { id: "paper",  label: "Paper", icon: "📄" },
 ];
 
 export default function BrushPicker({ theme, onChange }: Props) {

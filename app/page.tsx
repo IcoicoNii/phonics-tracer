@@ -34,33 +34,45 @@ export default function HomePage() {
       className="min-h-screen flex flex-col"
       style={{
         fontFamily: "var(--font-main)",
-        paddingTop: "var(--safe-top)",
-        paddingLeft: "var(--safe-left)",
+        paddingTop:   "var(--safe-top)",
+        paddingLeft:  "var(--safe-left)",
         paddingRight: "var(--safe-right)",
       }}
     >
-      {/* ── Header ─────────────────────────────────────────────────────────── */}
-      <header className="w-full px-4 pt-5 pb-3 max-w-2xl mx-auto w-full">
-        <div className="flex items-center gap-3">
+      {/* ── Header ──────────────────────────────────────────────────────────
+           3-column CSS grid: [trophy] [title] [toggle]
+           This prevents the title ever overlapping the flanking buttons,
+           which can happen with the absolute-positioning approach on narrow screens.
+      ─────────────────────────────────────────────────────────────────────── */}
+      <header className="w-full max-w-2xl mx-auto px-4 pt-5 pb-4">
+        <div className="grid grid-cols-[auto_1fr_auto] items-center gap-3">
 
-          {/* App title */}
-          <div className="flex-1 border min-w-0">
+          {/* Trophy link */}
+          <Link
+            href="/progress"
+            className="glass-card nav-btn flex-col gap-0.5 flex-shrink-0"
+            style={{ minWidth: 60, minHeight: 60, padding: "8px 14px" }}
+            aria-label="My stars"
+          >
+            <span className="text-2xl leading-none">🏆</span>
+            <span className="text-[11px] font-black" style={{ color: "var(--color-text-muted)" }}>Stars</span>
+          </Link>
+
+          {/* App title — center column, text naturally centers */}
+          <div className="flex flex-col items-center gap-0.5 min-w-0 overflow-hidden">
             <h1
-              className="text-3xl font-black leading-none tracking-tight"
-              style={{ color: "var(--color-text)" }}
+              className="text-3xl font-black leading-none tracking-tight text-transparent bg-clip-text bg-gradient-to-br from-orange-400 to-pink-500"
+              style={{ paddingBottom: "2px" }}
             >
               ABC Tracer
             </h1>
-            <p
-              className="text-sm font-bold mt-1"
-              style={{ color: "var(--color-text-muted)" }}
-            >
-              Pick a letter to trace! ✏️
+            <p className="text-xs font-bold" style={{ color: "var(--color-text-muted)" }}>
+              Pick a letter! ✏️
             </p>
           </div>
 
           {/* Case toggle */}
-          <div className="case-toggle border flex-shrink-0">
+          <div className="case-toggle flex-shrink-0">
             <button
               className={`case-btn ${caseMode === "upper" ? "active" : ""}`}
               onClick={() => setCaseMode("upper")}
@@ -79,23 +91,15 @@ export default function HomePage() {
             </button>
           </div>
 
-          {/* Trophy link */}
-          <Link
-            href="/progress"
-            className="glass-card nav-btn flex-col gap-0.5 flex-shrink-0"
-            style={{ minWidth: 56, minHeight: 56, padding: "8px 12px" }}
-            aria-label="My stars"
-          >
-            <span className="text-2xl leading-none">🏆</span>
-            <span className="text-[11px] font-black" style={{ color: "var(--color-text-muted)" }}>Stars</span>
-          </Link>
         </div>
       </header>
 
-      {/* ── Letter grid ────────────────────────────────────────────────────── */}
+      {/* ── Letter grid ──────────────────────────────────────────────────────
+           Same max-w / px as the header so edges always align.
+      ─────────────────────────────────────────────────────────────────────── */}
       <main
-        className="flex-1 w-[90vw] max-w-2xl mx-auto px-4 pb-6"
-        style={{ paddingBottom: `calc(1.5rem + var(--safe-bottom))` }}
+        className="flex-1 w-full max-w-2xl mx-auto px-4"
+        style={{ paddingBottom: `calc(2rem + var(--safe-bottom))` }}
       >
         {/*
           FIX: Use <Link> instead of <button> + router.push() inside setTimeout.
@@ -103,19 +107,20 @@ export default function HomePage() {
           iOS restricts navigation to synchronous user-gesture contexts.
           <Link> handles navigation immediately on tap/click, bypassing this.
         */}
-        <div className="grid gap-3"
+        <div
+          className="grid gap-3"
           style={{
-            gridTemplateColumns: "repeat(auto-fill, minmax(clamp(60px, 14vw, 90px), 1fr))",
+            gridTemplateColumns: "repeat(auto-fill, minmax(clamp(58px, 14vw, 78px), 1fr))",
           }}
         >
           {letters.map((displayLetter) => {
-            const upperKey = displayLetter.toUpperCase();
+            const upperKey    = displayLetter.toUpperCase();
             const progressKey = caseMode === "upper" ? upperKey : displayLetter.toLowerCase();
-            const mastery = getMasteryLevel(progressKey, progress);
-            const phonics = PHONICS[upperKey];
-            const color = getLetterColor(upperKey);
-            const isBouncing = bouncing === upperKey;
-            const href = `/trace/${caseMode === "upper" ? upperKey : displayLetter.toLowerCase()}`;
+            const mastery     = getMasteryLevel(progressKey, progress);
+            const phonics     = PHONICS[upperKey];
+            const color       = getLetterColor(upperKey);
+            const isBouncing  = bouncing === upperKey;
+            const href        = `/trace/${caseMode === "upper" ? upperKey : displayLetter.toLowerCase()}`;
 
             const bg = mastery >= 2
               ? `linear-gradient(145deg, ${lighten(color, 0.12)}, ${color})`
@@ -139,7 +144,7 @@ export default function HomePage() {
                 <span
                   className="leading-none font-black"
                   style={{
-                    fontSize: "clamp(22px, 5.5vw, 36px)",
+                    fontSize: "clamp(18px, 4.5vw, 28px)",
                     textShadow: "0 2px 5px rgba(0,0,0,0.18)",
                   }}
                 >
@@ -148,7 +153,7 @@ export default function HomePage() {
 
                 <span
                   className="leading-none"
-                  style={{ fontSize: "clamp(14px, 3.5vw, 22px)" }}
+                  style={{ fontSize: "clamp(12px, 3vw, 18px)" }}
                 >
                   {phonics?.emoji}
                 </span>
@@ -171,19 +176,21 @@ export default function HomePage() {
         </div>
 
         {/* Legend */}
-        <div className="flex justify-center gap-3 mt-5">
-          {[
-            { icon: "☆", label: "New" },
-            { icon: "⭐", label: "Learning" },
-            { icon: "🌟", label: "Mastered" },
-          ].map(({ icon, label }) => (
-            <div key={label} className="glass-card flex items-center gap-1.5 px-3 py-2">
-              <span className="text-base leading-none">{icon}</span>
-              <span className="text-xs font-bold" style={{ color: "var(--color-text-muted)" }}>
-                {label}
-              </span>
-            </div>
-          ))}
+        <div className="flex justify-center mt-6">
+          <div className="glass-card inline-flex items-center gap-5 px-6 py-3 rounded-full">
+            {[
+              { icon: "☆", label: "New" },
+              { icon: "⭐", label: "Learning" },
+              { icon: "🌟", label: "Mastered" },
+            ].map(({ icon, label }) => (
+              <div key={label} className="flex items-center gap-1.5">
+                <span className="text-lg leading-none">{icon}</span>
+                <span className="text-sm font-bold" style={{ color: "var(--color-text-muted)" }}>
+                  {label}
+                </span>
+              </div>
+            ))}
+          </div>
         </div>
       </main>
     </div>
@@ -193,15 +200,15 @@ export default function HomePage() {
 function lighten(hex: string, a: number): string {
   const n = parseInt(hex.slice(1), 16);
   const r = Math.min(255, ((n >> 16) & 0xff) + Math.round(255 * a));
-  const g = Math.min(255, ((n >> 8) & 0xff) + Math.round(255 * a));
-  const b = Math.min(255, (n & 0xff) + Math.round(255 * a));
+  const g = Math.min(255, ((n >>  8) & 0xff) + Math.round(255 * a));
+  const b = Math.min(255, ( n        & 0xff) + Math.round(255 * a));
   return `#${((r << 16) | (g << 8) | b).toString(16).padStart(6, "0")}`;
 }
 
 function darken(hex: string, a: number): string {
   const n = parseInt(hex.slice(1), 16);
   const r = Math.max(0, ((n >> 16) & 0xff) - Math.round(255 * a));
-  const g = Math.max(0, ((n >> 8) & 0xff) - Math.round(255 * a));
-  const b = Math.max(0, (n & 0xff) - Math.round(255 * a));
+  const g = Math.max(0, ((n >>  8) & 0xff) - Math.round(255 * a));
+  const b = Math.max(0, ( n        & 0xff) - Math.round(255 * a));
   return `#${((r << 16) | (g << 8) | b).toString(16).padStart(6, "0")}`;
 }
