@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
@@ -33,19 +33,19 @@ export default function HomePage() {
     <div
       className="min-h-screen flex flex-col"
       style={{
-        fontFamily: "var(--font-main)",
+        fontFamily:   "var(--font-main)",
         paddingTop:   "var(--safe-top)",
         paddingLeft:  "var(--safe-left)",
         paddingRight: "var(--safe-right)",
       }}
     >
-      {/* ── Header ──────────────────────────────────────────────────────────
+      {/* ── Header ─────────────────────────────────────────────────────────────
            3-column CSS grid: [trophy] [title] [toggle]
-           This prevents the title ever overlapping the flanking buttons,
-           which can happen with the absolute-positioning approach on narrow screens.
+           max-w-5xl expands content to 1024 px on desktop (was 672 px).
+           Padding and spacing scale up at md (768 px) breakpoint.
       ─────────────────────────────────────────────────────────────────────── */}
-      <header className="w-full max-w-2xl mx-auto px-4 pt-5 pb-4">
-        <div className="grid grid-cols-[auto_1fr_auto] items-center gap-3">
+      <header className="w-full max-w-5xl mx-auto px-4 md:px-8 pt-5 md:pt-10 pb-4 md:pb-6">
+        <div className="grid grid-cols-[auto_1fr_auto] items-center gap-3 md:gap-6">
 
           {/* Trophy link */}
           <Link
@@ -54,20 +54,29 @@ export default function HomePage() {
             style={{ minWidth: 60, minHeight: 60, padding: "8px 14px" }}
             aria-label="My stars"
           >
-            <span className="text-2xl leading-none">🏆</span>
-            <span className="text-[11px] font-black" style={{ color: "var(--color-text-muted)" }}>Stars</span>
+            <span className="text-2xl md:text-3xl leading-none">🏆</span>
+            <span
+              className="text-[11px] md:text-xs font-black"
+              style={{ color: "var(--color-text-muted)" }}
+            >
+              Stars
+            </span>
           </Link>
 
-          {/* App title — center column, text naturally centers */}
-          <div className="flex flex-col items-center gap-0.5 min-w-0 overflow-hidden">
+          {/* App title — center column */}
+          <div className="flex flex-col items-center gap-1 min-w-0 overflow-hidden">
             <h1
-              className="text-3xl font-black leading-none tracking-tight text-transparent bg-clip-text bg-gradient-to-br from-orange-400 to-pink-500"
+              className="font-black leading-none tracking-tight text-transparent bg-clip-text bg-gradient-to-br from-orange-400 to-pink-500 text-3xl md:text-5xl lg:text-6xl"
               style={{ paddingBottom: "2px" }}
             >
               ABC Tracer
             </h1>
-            <p className="text-xs font-bold" style={{ color: "var(--color-text-muted)" }}>
-              Pick a letter! ✏️
+            <p
+              className="text-xs md:text-sm font-bold"
+              style={{ color: "var(--color-text-muted)" }}
+            >
+              <span className="hidden md:inline">Pick a letter to trace! ✏️</span>
+              <span className="md:hidden">Pick a letter! ✏️</span>
             </p>
           </div>
 
@@ -78,7 +87,7 @@ export default function HomePage() {
               onClick={() => setCaseMode("upper")}
               aria-pressed={caseMode === "upper"}
             >
-              <span className="text-xl font-black">A</span>
+              <span className="text-xl md:text-2xl font-black">A</span>
               <span>Big</span>
             </button>
             <button
@@ -86,19 +95,28 @@ export default function HomePage() {
               onClick={() => setCaseMode("lower")}
               aria-pressed={caseMode === "lower"}
             >
-              <span className="text-xl font-black">a</span>
+              <span className="text-xl md:text-2xl font-black">a</span>
               <span>Small</span>
             </button>
           </div>
 
         </div>
+
+        {/* Subtle divider — only shown on md+ between header and grid */}
+        <div className="hidden md:block mt-6 h-px bg-gradient-to-r from-transparent via-black/10 to-transparent" />
       </header>
 
-      {/* ── Letter grid ──────────────────────────────────────────────────────
-           Same max-w / px as the header so edges always align.
-      ─────────────────────────────────────────────────────────────────────── */}
+      {/* ── Letter grid ────────────────────────────────────────────────────────
+           Same max-w and px as the header so edges always align.
+
+           Tile sizing strategy  —  clamp(58px, 14vw, 96px):
+             Phone  (375 px, inner ≈ 343 px): 14vw=52 → 58 px min → 5 cols
+             Tablet (768 px, inner ≈ 640 px): 14vw=107 → 96 px max → 6–7 cols
+             Desktop (1440 px, inner ≈ 960 px): 14vw=201 → 96 px max → 9 cols
+           26 letters:  5 cols → 6 rows  |  7 cols → 4 rows  |  9 cols → 3 rows ✓
+      ──────────────────────────────────────────────────────────────────────── */}
       <main
-        className="flex-1 w-full max-w-2xl mx-auto px-4"
+        className="flex-1 w-full max-w-5xl mx-auto px-4 md:px-8"
         style={{ paddingBottom: `calc(2rem + var(--safe-bottom))` }}
       >
         {/*
@@ -108,9 +126,9 @@ export default function HomePage() {
           <Link> handles navigation immediately on tap/click, bypassing this.
         */}
         <div
-          className="grid gap-3"
+          className="grid gap-3 md:gap-5"
           style={{
-            gridTemplateColumns: "repeat(auto-fill, minmax(clamp(58px, 14vw, 78px), 1fr))",
+            gridTemplateColumns: "repeat(auto-fill, minmax(clamp(58px, 14vw, 96px), 1fr))",
           }}
         >
           {letters.map((displayLetter) => {
@@ -144,7 +162,7 @@ export default function HomePage() {
                 <span
                   className="leading-none font-black"
                   style={{
-                    fontSize: "clamp(18px, 4.5vw, 28px)",
+                    fontSize:   "clamp(18px, 4.5vw, 32px)",
                     textShadow: "0 2px 5px rgba(0,0,0,0.18)",
                   }}
                 >
@@ -153,7 +171,7 @@ export default function HomePage() {
 
                 <span
                   className="leading-none"
-                  style={{ fontSize: "clamp(12px, 3vw, 18px)" }}
+                  style={{ fontSize: "clamp(12px, 3vw, 22px)" }}
                 >
                   {phonics?.emoji}
                 </span>
@@ -176,16 +194,19 @@ export default function HomePage() {
         </div>
 
         {/* Legend */}
-        <div className="flex justify-center mt-6">
-          <div className="glass-card inline-flex items-center gap-5 px-6 py-3 rounded-full">
+        <div className="flex justify-center mt-6 md:mt-10">
+          <div className="glass-card inline-flex items-center gap-5 md:gap-8 px-6 md:px-10 py-3 md:py-4 rounded-full">
             {[
               { icon: "☆", label: "New" },
               { icon: "⭐", label: "Learning" },
               { icon: "🌟", label: "Mastered" },
             ].map(({ icon, label }) => (
-              <div key={label} className="flex items-center gap-1.5">
-                <span className="text-lg leading-none">{icon}</span>
-                <span className="text-sm font-bold" style={{ color: "var(--color-text-muted)" }}>
+              <div key={label} className="flex items-center gap-1.5 md:gap-2">
+                <span className="text-lg md:text-2xl leading-none">{icon}</span>
+                <span
+                  className="text-sm md:text-base font-bold"
+                  style={{ color: "var(--color-text-muted)" }}
+                >
                   {label}
                 </span>
               </div>
